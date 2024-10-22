@@ -1,0 +1,67 @@
+---
+- name: Install Required Packages
+  become: yes
+  package:
+      name: "{{item}}"
+      state: present
+  loop:
+  - "zlib1g:i386"
+  when: jvpn_install and (ansible_distribution == "Fedora")
+
+- name: Install Required Packages
+  become: yes
+  package:
+      name: "{{item}}"
+      state: present
+  loop:
+  - "zlib1g:i386"
+  - "libwww-perl"
+  when: jvpn_install and (ansible_distribution == "Ubuntu")
+
+- name: Install Required Perl Packages
+  become: yes
+  command: cpan {{ item }}
+  loop:
+  - "Term::ReadKey"
+  when: jvpn_install
+
+- name: Create VPN Folder
+  become: no
+  file:
+      path: "{{ansible_user_dir}}/VPN"
+      state: directory
+      mode: 0755
+      recurse: yes
+  when: jvpn_install
+
+- name: Create Pulse Secure Folder
+  become: no
+  file:
+      path: "{{ansible_user_dir}}/.pulse_secure/network_connect"
+      state: directory
+      mode: 0755
+      recurse: yes
+  when: jvpn_install
+
+- name: Copy Perl Script
+  become: no
+  copy:
+      src: "files/{{ item }}"
+      dest: "{{ansible_user_dir}}/VPN/{{ item }}"
+      owner: "{{ansible_user_uid}}"
+      group: "{{ansible_user_gid}}"
+      mode: 0764
+  loop:
+  - "jvpn.pl"
+  - "vpn.sh"
+  when: jvpn_install
+
+- name: Create Configuration File
+  become: no
+  template:
+      src: "templates/jvpn.ini.j2"
+      dest: "{{ansible_user_dir}}/VPN/jvpn.ini"
+      owner: "{{ansible_user_uid}}"
+      group: "{{ansible_user_gid}}"
+      mode: 0664
+  when: jvpn_install

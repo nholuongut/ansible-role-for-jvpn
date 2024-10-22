@@ -1,0 +1,8 @@
+---
+jvpn_install: true
+jvpn_vpn_host: portal.transparent.com
+jvpn_vpn_port: 443
+jvpn_vpn_url: url_1
+jvpn_vpn_realm: Nholu_Users
+jvpn_vpn_username: CHANGEME
+jvpn_vpn_password: CHANGEME
